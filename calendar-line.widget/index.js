@@ -87,7 +87,7 @@ style: "                              \n\
 ",
 
 update: function (output, domEl) {
-    var date = new Date(), y = date.getFullYear(), m = date.getMonth(), today = date.getDate();
+  var date = new Date(), y = date.getFullYear(), m = date.getMonth(), today = date.getDate();
   
   // DON'T MANUPULATE DOM IF NOT NEEDED
   var newDate = [today, m, y].join("/");
@@ -96,7 +96,6 @@ update: function (output, domEl) {
 
   var firstWeekDay = new Date(y, m, 1).getDay();
   var lastDate = new Date(y, m + 1, 0).getDate();
-  var pastMonday = firstWeekDay == 1;  
   
   var weekdays = "", midlines = "", dates = "", weeknums = "";
 
@@ -116,16 +115,15 @@ update: function (output, domEl) {
     dates += "<td class=\""+className+"\">" + i + "</td>";
     if (w==1 && (lastDate-i)>=2) { // display week above Monday unless this is the last 2 columns
       weeknums += "<td class=\"ordinary\" colspan=\"7\">" + "Week " + wnum + "</td>";
-      pastMonday = true;
-    } else if (w>1 && w<5 && !pastMonday) {
+    } else if (i==1 && w>1 && w<5) { // Week Number for partial weeks starting Tue-Thu
       // Only show first partial week if month starts on Thu or
       // earlier; this also avoids figuring out if previous year had
       // 52 or 53 weeks (convenient...).
       var span = 8-w;
       weeknums += "<td class=\"ordinary\" colspan=\"" + span + "\">" + "Week " + wnum + "</td>";
-      pastMonday = true;
-    } else if (!pastMonday) {
-      weeknums += "<td class=\"ordinary\"></td>"
+    } else if (i==1) { // empty spacer if first day is Fri-Sun
+      var span = 8-w;
+      weeknums += "<td class=\"ordinary\" colspan=\"" + span + "\"></td>"
     }
   };
 
@@ -136,3 +134,7 @@ update: function (output, domEl) {
   $(domEl).find(".date").html(dates);
 }
 
+// Local Variables:
+// js-indent-level: 2
+// indent-tabs-mode: nil
+// End
