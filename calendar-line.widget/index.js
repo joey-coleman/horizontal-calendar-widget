@@ -1,9 +1,8 @@
-command: "echo Hello World!",
-// command: 'date -v1d +"%e"; date -v1d -v+1m -v-1d +"%d"; date +"%d%n%m%n%Y"',
+command: "true",
 
 dayNames: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
 monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-offdayIndices: [5, 6], // Fr, Sa
+offdayIndices: [6, 0], // Sa, Su
  
 refreshFrequency: 5000,
 displayedDate: null,
@@ -12,6 +11,7 @@ render: function () {
   return "<div class=\"cal-container\">\
   <div class=\"title\"></div>\
   <table>\
+  <tr class=\"weeknum\"></tr>\
   <tr class=\"weekday\"></tr>\
   <tr class=\"midline\"></tr>\
   <tr class=\"date\"></tr>\
@@ -20,21 +20,21 @@ render: function () {
 },
  
 style: "                              \n\
-  bottom: 20px                        \n\
-  left: 20px                          \n\
+  bottom: 10px                        \n\
+  left: 10px                          \n\
   font-family: Helvetica Neue         \n\
-  font-size: 11px                     \n\
-  font-weight: 500                    \n\
+  font-size: 10px                     \n\
+  font-weight: 400                    \n\
   color: #fff                         \n\
                                       \n\
   .cal-container                      \n\
-    border-radius: 10px               \n\
+    border-radius: 8px                \n\
     background: rgba(#000, 0.3)       \n\
-    padding: 10px                     \n\
+    padding: 8px                      \n\
                                       \n\
   .title                              \n\
     color: rgba(#fff, .3)             \n\
-    font-size: 14px                   \n\
+    font-size: 12px                   \n\
     font-weight: 500                  \n\
     padding-bottom: 5px               \n\
     text-transform uppercase          \n\
@@ -79,16 +79,13 @@ style: "                              \n\
                                       \n\
   .offday, .off-today                 \n\
     color: rgba(#f77, 1)              \n\
+                                      \n\
+  .weeknum td                         \n\
+    text-align: left                  \n\
 ",
 
 update: function (output, domEl) {
-  // var date = output.split("\n"), firstWeekDay = date[0], lastDate = date[1], today = date[2], m = date[3]-1, y = date[4];
-  
-  // // DON'T MANUPULATE DOM IF NOT NEEDED
-  // if(this.displayedDate != null && this.displayedDate == output) return;
-  // else this.displayedDate = output;
-
-  var date = new Date(), y = date.getFullYear(), m = date.getMonth(), today = date.getDate();
+    var date = new Date(), y = date.getFullYear(), m = date.getMonth(), today = date.getDate();
   
   // DON'T MANUPULATE DOM IF NOT NEEDED
   var newDate = [today, m, y].join("/");
@@ -97,8 +94,12 @@ update: function (output, domEl) {
 
   var firstWeekDay = new Date(y, m, 1).getDay();
   var lastDate = new Date(y, m + 1, 0).getDate();
+  var pastMonday = firstWeekDay == 1;  
   
-  var weekdays = "", midlines = "", dates = "";
+  var weekdays = "", midlines = "", dates = "", weeknums = "";
+
+  var dayOfYearOffsets = [ [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334] , // regular years
+                           [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335] ] // leap years
 
   for (var i = 1, w = firstWeekDay; i <= lastDate; i++, w++) {
     w %= 7;
@@ -108,13 +109,31 @@ update: function (output, domEl) {
     else if(isToday) className = "today";
     else if(isOffday) className = "offday";
 
+    var leap = y%4?0:1; // yes, this doesn't account for centuries
+    var wnum = Math.floor( (dayOfYearOffsets[leap][m] + i - w + 10) / 7 ); // Yay wikipedia
+
     weekdays += "<td class=\""+className+"\">" + this.dayNames[w] + "</td>";
     midlines += "<td class=\""+className+"\"></td>";
     dates += "<td class=\""+className+"\">" + i + "</td>";
+    if (w==1 && (lastDate-i)>=2) { // display week above Monday unless this is the last 2 columns
+      weeknums += "<td class=\"ordinary\" colspan=\"7\">" + "Week " + wnum + "</td>";
+      pastMonday = true;
+    } else if (w>1 && w<5 && !pastMonday) {
+      // Only show first partial week if month starts on Thu or
+      // earlier; this also avoids figuring out if previous year had
+      // 52 or 53 weeks (convenient...).
+      var span = 8-w;
+      weeknums += "<td class=\"ordinary\" colspan=\"" + span + "\">" + "Week " + wnum + "</td>";
+      pastMonday = true;
+    } else if (!pastMonday) {
+      weeknums += "<td class=\"ordinary\"></td>"
+    }
   };
 
   $(domEl).find(".title").html(this.monthNames[m]+" "+y);
+  $(domEl).find(".weeknum").html(weeknums);
   $(domEl).find(".weekday").html(weekdays);
   $(domEl).find(".midline").html(midlines);
   $(domEl).find(".date").html(dates);
 }
+
