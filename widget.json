@@ -1,6 +1,8 @@
 {
-  "name": "Horizontal Calendar",
-  "description": "A sleek Dateline-like horizontal calendar",
-  "author": "Ashik uddin Ahmad",
-  "email": "ashik.u.ahmad@gmail.com"
+    "name": "Horizontal Calendar Line",
+    "description": "A sleek Dateline-like horizontal calendar",
+    "author": "Joey Coleman",
+    "email": "joeycoleman@gmail.com",
+    "orig-author": "Ashik uddin Ahmad",
+    "orig-email": "ashik.u.ahmad@gmail.com"
 }
