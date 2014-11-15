@@ -1,15 +1,20 @@
-command: "true",
+command: "/Users/jwc/bin/daysOff",
 
 dayNames: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
 monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
 dayOfYearOffsets: [ [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334] ,  // regular years
                     [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335] ], // leap years
 offdayIndices: [6, 0], // Sa, Su
- 
+daysOffOutput: [],
+
+
 refreshFrequency: 5000,
 displayedDate: null,
 
-render: function () {
+render: function (output) {
+    if (output) {
+        this.daysOffOutput = output.split('\n').map(Number).filter(Boolean);
+    }
     return "<div class=\"cal-container\">\
   <div class=\"title\"></div>\
     <table>\
@@ -95,6 +100,10 @@ update: function (output, domEl) {
     if(this.displayedDate != null && this.displayedDate == newDate) return;
     else this.displayedDate = newDate;
 
+    if (output) {
+        this.daysOffOutput = output.split('\n').map(Number).filter(Boolean);
+    }
+
     var firstWeekDay = new Date(y, m, 1).getDay();
     var lastDate = new Date(y, m + 1, 0).getDate();
     
@@ -102,7 +111,8 @@ update: function (output, domEl) {
 
     for (var i = 1, w = firstWeekDay; i <= lastDate; i++, w++) {
         w %= 7;
-        var isToday = (i == today), isOffday = (this.offdayIndices.indexOf(w) != -1);
+        var isToday = (i == today);
+        var isOffday = (this.offdayIndices.indexOf(w) != -1) || (this.daysOffOutput.indexOf(i) != -1);
         var className = "ordinary";
         if(isToday && isOffday) className = "off-today";
         else if(isToday) className = "today";
