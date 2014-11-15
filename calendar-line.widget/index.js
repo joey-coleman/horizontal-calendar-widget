@@ -10,15 +10,16 @@ refreshFrequency: 5000,
 displayedDate: null,
 
 render: function () {
-  return "<div class=\"cal-container\">\
+    return "<div class=\"cal-container\">\
   <div class=\"title\"></div>\
-  <table>\
-  <tr class=\"weeknum\"></tr>\
-  <tr class=\"weekday\"></tr>\
-  <tr class=\"midline\"></tr>\
-  <tr class=\"date\"></tr>\
-  </table>\
-  </div>";
+    <table>\
+      <tr class=\"weeknum\"></tr>\
+      <tr class=\"weekday\"></tr>\
+      <tr class=\"midline\"></tr>\
+      <tr class=\"date\"></tr>\
+    </table>\
+  </div>\
+</div>";
 },
  
 style: "                              \n\
@@ -87,54 +88,49 @@ style: "                              \n\
 ",
 
 update: function (output, domEl) {
-  var date = new Date(), y = date.getFullYear(), m = date.getMonth(), today = date.getDate();
-  
-  // DON'T MANUPULATE DOM IF NOT NEEDED
-  var newDate = [today, m, y].join("/");
-  if(this.displayedDate != null && this.displayedDate == newDate) return;
-  else this.displayedDate = newDate;
+    var date = new Date(), y = date.getFullYear(), m = date.getMonth(), today = date.getDate();
+    
+    // DON'T MANUPULATE DOM IF NOT NEEDED
+    var newDate = [today, m, y].join("/");
+    if(this.displayedDate != null && this.displayedDate == newDate) return;
+    else this.displayedDate = newDate;
 
-  var firstWeekDay = new Date(y, m, 1).getDay();
-  var lastDate = new Date(y, m + 1, 0).getDate();
-  
-  var weekdays = "", midlines = "", dates = "", weeknums = "";
+    var firstWeekDay = new Date(y, m, 1).getDay();
+    var lastDate = new Date(y, m + 1, 0).getDate();
+    
+    var weekdays = "", midlines = "", dates = "", weeknums = "";
 
-  for (var i = 1, w = firstWeekDay; i <= lastDate; i++, w++) {
-    w %= 7;
-    var isToday = (i == today), isOffday = (this.offdayIndices.indexOf(w) != -1);
-    var className = "ordinary";
-    if(isToday && isOffday) className = "off-today";
-    else if(isToday) className = "today";
-    else if(isOffday) className = "offday";
+    for (var i = 1, w = firstWeekDay; i <= lastDate; i++, w++) {
+        w %= 7;
+        var isToday = (i == today), isOffday = (this.offdayIndices.indexOf(w) != -1);
+        var className = "ordinary";
+        if(isToday && isOffday) className = "off-today";
+        else if(isToday) className = "today";
+        else if(isOffday) className = "offday";
 
-    var leap = y%4?0:1; // yes, this doesn't account for centuries
-    var wnum = Math.floor( (this.dayOfYearOffsets[leap][m] + i - w + 10) / 7 ); // Yay wikipedia
+        var leap = y%4?0:1; // yes, this doesn't account for centuries
+        var wnum = Math.floor( (this.dayOfYearOffsets[leap][m] + i - w + 10) / 7 ); // Yay wikipedia
 
-    weekdays += "<td class=\""+className+"\">" + this.dayNames[w] + "</td>";
-    midlines += "<td class=\""+className+"\"></td>";
-    dates += "<td class=\""+className+"\">" + i + "</td>";
-    if (w==1 && (lastDate-i)>=2) { // display week above Monday unless this is the last 2 columns
-      weeknums += "<td class=\"ordinary\" colspan=\"7\">" + "Week " + wnum + "</td>";
-    } else if (i==1 && w>1 && w<5) { // Week Number for partial weeks starting Tue-Thu
-      // Only show first partial week if month starts on Thu or
-      // earlier; this also avoids figuring out if previous year had
-      // 52 or 53 weeks (convenient...).
-      var span = 8-w;
-      weeknums += "<td class=\"ordinary\" colspan=\"" + span + "\">" + "Week " + wnum + "</td>";
-    } else if (i==1) { // empty spacer if first day is Fri-Sun
-      var span = 8-w;
-      weeknums += "<td class=\"ordinary\" colspan=\"" + span + "\"></td>"
-    }
-  };
+        weekdays += "<td class=\""+className+"\">" + this.dayNames[w] + "</td>";
+        midlines += "<td class=\""+className+"\"></td>";
+        dates += "<td class=\""+className+"\">" + i + "</td>";
+        if (w==1 && (lastDate-i)>=2) { // display week above Monday unless this is the last 2 columns
+            weeknums += "<td class=\"ordinary\" colspan=\"7\">" + "Week " + wnum + "</td>";
+        } else if (i==1 && w>1 && w<5) { // Week Number for partial weeks starting Tue-Thu
+            // Only show first partial week if month starts on Thu or
+            // earlier; this also avoids figuring out if previous year had
+            // 52 or 53 weeks (convenient...).
+            var span = 8-w;
+            weeknums += "<td class=\"ordinary\" colspan=\"" + span + "\">" + "Week " + wnum + "</td>";
+        } else if (i==1) { // empty spacer if first day is Fri-Sun
+            var span = 8-w;
+            weeknums += "<td class=\"ordinary\" colspan=\"" + span + "\"></td>"
+        }
+    };
 
-  $(domEl).find(".title").html(this.monthNames[m]+" "+y);
-  $(domEl).find(".weeknum").html(weeknums);
-  $(domEl).find(".weekday").html(weekdays);
-  $(domEl).find(".midline").html(midlines);
-  $(domEl).find(".date").html(dates);
+    $(domEl).find(".title").html(this.monthNames[m]+" "+y);
+    $(domEl).find(".weeknum").html(weeknums);
+    $(domEl).find(".weekday").html(weekdays);
+    $(domEl).find(".midline").html(midlines);
+    $(domEl).find(".date").html(dates);
 }
-
-// Local Variables:
-// js-indent-level: 2
-// indent-tabs-mode: nil
-// End
