@@ -12,9 +12,9 @@ import Foundation
 import EventKit
 
 // The days we're interested in...
-let daysOff = [ "vacation", "nytårsdag", "skærtorsdag", "langfredag",
-    "2. påskedag", "store bededag", "kristi himmelfartsdag", "grundlovsdag",
-    "juleaften", "juledag", "2. juledag", "nytårsaften" ]
+let daysOff = [ "vacation", "holiday", "omsorgsdag", "nytårsdag", "skærtorsdag",
+    "langfredag", "2. påskedag", "store bededag", "kristi himmelfartsdag",
+    "grundlovsdag", "juleaften", "juledag", "2. juledag", "nytårsaften" ]
 
 // http://stackoverflow.com/a/24102152/753029
 // This is a nice trick; also shows a few language quirks/features
